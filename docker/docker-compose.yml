@@ -1,0 +1,107 @@
+services:
+
+  frontend:
+    build:
+      context: ../src/frontend
+    ports:
+      - "8080:8080"
+    environment:
+      PORT: "8080"
+      LISTEN_ADDR: "0.0.0.0:8080"
+      PRODUCT_CATALOG_SERVICE_ADDR: "productcatalogservice:3550"
+      CURRENCY_SERVICE_ADDR: "currencyservice:7000"
+      CART_SERVICE_ADDR: "cartservice:7070"
+      RECOMMENDATION_SERVICE_ADDR: "recommendationservice:8080"
+      CHECKOUT_SERVICE_ADDR: "checkoutservice:5050"
+      SHIPPING_SERVICE_ADDR: "shippingservice:50051"
+      AD_SERVICE_ADDR: "adservice:9555"
+      SHOPPING_ASSISTANT_SERVICE_ADDR: "shoppingassistantservice:8080"
+    depends_on:
+      - productcatalogservice
+      - currencyservice
+      - cartservice
+      - recommendationservice
+      - checkoutservice
+      - shippingservice
+      - adservice
+
+  productcatalogservice:
+    build:
+      context: ../src/productcatalogservice
+    environment:
+      PORT: "3550"
+
+  currencyservice:
+    build:
+      context: ../src/currencyservice
+    environment:
+      PORT: "7000"
+
+  cartservice:
+    build:
+      context: ../src/cartservice
+      dockerfile: src/Dockerfile
+    environment:
+      ASPNETCORE_HTTP_PORTS: "7070"
+
+  recommendationservice:
+    build:
+      context: ../src/recommendationservice
+    environment:
+      PORT: "8080"
+      PRODUCT_CATALOG_SERVICE_ADDR: "productcatalogservice:3550"
+    depends_on:
+      - productcatalogservice
+
+  shippingservice:
+    build:
+      context: ../src/shippingservice
+    environment:
+      APP_PORT: "50051"
+
+  paymentservice:
+    build:
+      context: ../src/paymentservice
+    environment:
+      PORT: "50051"
+
+  emailservice:
+    build:
+      context: ../src/emailservice
+    environment:
+      PORT: "8080"
+
+  checkoutservice:
+    build:
+      context: ../src/checkoutservice
+    environment:
+      PORT: "5050"
+      SHIPPING_SERVICE_ADDR: "shippingservice:50051"
+      PRODUCT_CATALOG_SERVICE_ADDR: "productcatalogservice:3550"
+      CART_SERVICE_ADDR: "cartservice:7070"
+      CURRENCY_SERVICE_ADDR: "currencyservice:7000"
+      EMAIL_SERVICE_ADDR: "emailservice:8080"
+      PAYMENT_SERVICE_ADDR: "paymentservice:50051"
+    depends_on:
+      - shippingservice
+      - productcatalogservice
+      - cartservice
+      - currencyservice
+      - emailservice
+      - paymentservice
+
+  adservice:
+    build:
+      context: ../src/adservice
+    environment:
+      PORT: "9555"
+
+  shoppingassistantservice:
+    build:
+      context: ../src/shoppingassistantservice
+    environment:
+      PORT: "8080"
+
+networks:
+  default:
+    name: online-boutique
